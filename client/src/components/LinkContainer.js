@@ -25,7 +25,7 @@ const LinkContainer = (props) => {
   // Create new link
   const handleSubmit = async (link) => {
     try {
-      const response = await fetch('/api/new', {
+      const response = await fetch('/api/links', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
