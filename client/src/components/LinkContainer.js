@@ -10,6 +10,12 @@ const LinkContainer = (props) => {
     try {
       const response = await fetch('/api/links')
       const data = await response.json()
+      if (!Array.isArray(data)) {
+        console.error('API /api/links returned non-array:', data)
+        // If API returned an error object, keep links empty to avoid crashing
+        setLinks([])
+        return
+      }
       setLinks(data)
     } catch (error) {
       console.error('Error fetching links:', error)
@@ -27,6 +33,10 @@ const LinkContainer = (props) => {
         body: JSON.stringify(link)
       })
       const newLink = await response.json()
+      if (!response.ok) {
+        console.error('API /api/new error:', newLink)
+        return
+      }
       setLinks([...links, newLink])
     } catch (error) {
       console.error('Error creating link:', error)
@@ -44,6 +54,10 @@ const LinkContainer = (props) => {
         body: JSON.stringify(updatedLink)
       })
       const updated = await response.json()
+      if (!response.ok) {
+        console.error('API /api/links/:id update error:', updated)
+        return
+      }
       setLinks(links.map((link) => (link.id === id ? updated : link)))
     } catch (error) {
       console.error('Error updating link:', error)
@@ -53,9 +67,14 @@ const LinkContainer = (props) => {
   // Delete link
   const handleRemove = async (id) => {
     try {
-      await fetch(`/api/links/${id}`, {
+      const response = await fetch(`/api/links/${id}`, {
         method: 'DELETE'
       })
+      const result = await response.json()
+      if (!response.ok) {
+        console.error('API /api/links/:id delete error:', result)
+        return
+      }
       setLinks(links.filter((link) => link.id !== id))
     } catch (error) {
       console.error('Error deleting link:', error)
